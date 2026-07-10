@@ -1,11 +1,8 @@
 import os
 import sys
 import torch
-import pandas as pd 
-import numpy as np
-from torch.utils.data import DataLoader,Dataset
 from torch import nn
-from torchvision import datasets,transforms,models
+from torchvision import models
 from pathlib import Path
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -26,11 +23,13 @@ class plant_disease_prediction(nn.Module):
 def main():
     file_path = Path(__file__).resolve().parent.parent
     model_path = file_path/"Resnet"/"plant_disease_model.pth"
-    loaded_weights_bais = torch.load(model_path,map_location="cpu")
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model weights not found at {model_path}")
+    loaded_weights_bais = torch.load(model_path,map_location="cpu",weights_only=True)
     model = plant_disease_prediction(output_class=6)
     model.load_state_dict(loaded_weights_bais)
     model.eval()
-    print("model loaded successfully")
+    return model
 
 if __name__ == "__main__":
     main()    
