@@ -1,61 +1,129 @@
-## 🌱 Plant Disease Prediction
 ## 📌 Overview
 This project uses deep learning to classify plant leaf images into six categories:
 Canker, Greening, Gummosis, Healthy, Leaf‑miner, and Lemon‑butterfly.
 
 By leveraging ResNet18, a powerful convolutional neural network, the model helps farmers and researchers detect plant diseases early. Early detection means healthier crops, improved yields, and reduced losses.
 
-##  Goals
-Provide an automated way to identify plant diseases from leaf images.
+## Plant Disease Prediction API
 
-Support farmers with quick, reliable insights for better crop management.
+A FastAPI service that classifies plant leaf images into one of six categories using a fine-tuned ResNet18 model (PyTorch).
 
-Assist researchers in building scalable solutions for agricultural health monitoring.
+## Classes
 
-## Dataset
-The dataset contains ~18,000 images organized into six folders (one per class).
+The model predicts one of the following:
 
-Each folder represents a disease type or healthy leaves.
+- Canker
+- Greening
+- Gummosis
+- Healthy
+- Leaf-miner
+- Lemon-butterfly
 
-Images are preprocessed and split into train and test sets with consistent class mappings.
+## Project Structure
 
-## Features
-ResNet18 backbone fine‑tuned for plant disease classification.
+```
+plant_disease_prediction/
+├── app/
+│   ├── backend/
+│   │   ├── fast_api.py       # FastAPI app + /predict endpoint
+│   │   ├── model.py          # Model definition + loading
+│   │   └── preprocess.py     # Image preprocessing pipeline
+│   └── Resnet/
+│       └── plant_disease_model.pth   # Trained model weights
+├── requirements.txt
+└── README.md
+```
 
-Six‑class output layer tailored to the dataset.
+## Requirements
 
-Training pipeline built with PyTorch.
+- Python 3.10+
+- See `requirements.txt` for Python package dependencies
 
-Support for GPU acceleration to speed up training.
+## Setup
 
-Evaluation metrics: accuracy, confusion matrix, and per‑class performance.
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd plant_disease_prediction
+   ```
 
-## How It Works
-Load and preprocess leaf images.
+2. **Create and activate a virtual environment**
+   ```bash
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # macOS/Linux
+   source venv/bin/activate
+   ```
 
-Train ResNet18 on the dataset.
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Predict disease category for new leaf samples.
+4. **Add the model weights**
 
-Provide results that can guide farmers and researchers in decision‑making.
+   Ensure `plant_disease_model.pth` is placed at `app/Resnet/plant_disease_model.pth`.
 
-## Future Work
-Experiment with deeper architectures (ResNet50, EfficientNet).
+## Running the Server
 
-Add real‑time prediction support via IoT devices.
+From `app/backend/`:
 
-Expand dataset to cover more plant species and diseases.
+```bash
+cd app/backend
+uvicorn fast_api:app --reload --host 0.0.0.0 --port 8000
+```
 
-Deploy as a web or mobile app for farmer‑friendly usage.
+The server will be available locally at:
 
-## Contribution
-Contributions are welcome! You can:
+```
+http://127.0.0.1:8000
+```
 
-Improve preprocessing techniques.
+## API Endpoints
 
-Suggest new architectures.
+### `GET /health`
 
-Add documentation or tutorials.
+Health check — confirms the server is running and the model loaded successfully.
+
+**Response**
+```json
+{
+  "status": "ok",
+  "model_loaded": true
+}
+```
+
+### `POST /predict/`
+
+Upload an image and receive a disease classification.
+
+**Request**: `multipart/form-data` with a `file` field containing an image (JPEG/PNG).
+
+**Response**
+```json
+{
+  "filename": "leaf.jpg",
+  "prediction": "Healthy",
+  "confidence": 0.9231
+}
+```
+
+### Interactive Docs
+
+Once the server is running, visit:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+for a Swagger UI where you can test the `/predict/` endpoint directly from the browser.
+
+## Model Details
+
+- **Architecture**: ResNet18 (from `torchvision.models`), final fully-connected layer replaced to output 6 classes
+- **Input size**: 224×224 RGB images
+- **Normalization**: ImageNet mean/std (`[0.485, 0.456, 0.406]` / `[0.229, 0.224, 0.225]`)
 
 ## License
 This project is open‑source. Feel free to use, modify, and share with proper attribution.
