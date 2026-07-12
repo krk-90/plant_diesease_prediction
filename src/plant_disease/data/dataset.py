@@ -73,6 +73,7 @@ def get_class_names(data_root: Path = DATA_ROOT) -> list[str]:
 
 
 if __name__ == "__main__":
+    build_datasets()
     train_dataset, test_dataset = build_datasets()
     print(f"Train size: {len(train_dataset)}, Test size: {len(test_dataset)}")
     print(f"Classes: {get_class_names()}")
