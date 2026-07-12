@@ -9,7 +9,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(PROJECT_ROOT)
 from Models.registry import get_model
-from data.dataset import train_dataset
+from data.dataset import build_datasets
+train_dataset, test_dataset = build_datasets()
 Model = get_model()
 loss_func = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(Model.resnet.fc.parameters(),lr= 0.01)

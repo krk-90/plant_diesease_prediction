@@ -8,8 +8,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(PROJECT_ROOT)
 from training.train import Model,loss_func
-from data.dataset import train_dataset,test_dataset
-
+from data.dataset import build_datasets
+train_dataset, test_dataset = build_datasets()
 def accuracy_function(y_true, y_pred):
     y_pred_tags = torch.argmax(y_pred, dim=1)
     correct_results_sum = (y_pred_tags == y_true).sum().item()
