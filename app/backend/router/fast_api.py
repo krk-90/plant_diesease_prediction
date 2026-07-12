@@ -4,6 +4,7 @@ import io
 import torch
 from PIL import Image,UnidentifiedImageError
 from fastapi import FastAPI,File, UploadFile, HTTPException
+from contextlib import asynccontextmanager
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
@@ -12,16 +13,19 @@ if PROJECT_ROOT not in sys.path:
 from preprocess import processed
 from model import main
 
-app = FastAPI(title="plant_diesease_prediction",version="1.0.0")
 model = None
-@app.on_event("startup")
-def load_model():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global model
     try:
         model = main()
     except Exception as e:
         print(f"Error loading model: {e}")
         raise
+    yield
+
+app = FastAPI(title="plant_diesease_prediction",version="1.0.0",lifespan=lifespan)
 
 class_names = ['Canker', 'Greening', 'Gummosis', 'Healthy', 'Leaf-miner', 'Lemon-butterfly']
 @app.post("/predict/")
